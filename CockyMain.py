@@ -4,7 +4,7 @@ import Const
 __author__ = 'lei'
 
 
-class Feed():
+class Feed:
     def __init__(self, doc=Document()):
         """
         Root Element
@@ -55,6 +55,8 @@ class Feed():
         entry.appendChild(link)
         return link
 
+    def cleanDoc(self):
+        self.doc = Document()
 
 class Link:
     def __init__(self, href, rel, title, type):
