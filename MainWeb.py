@@ -1,3 +1,4 @@
+from xml.dom.minidom import Document
 from flask import Flask
 from CockyMain import Feed, Link
 
@@ -5,9 +6,11 @@ from CockyMain import Feed, Link
 __author__ = 'lei'
 
 app = Flask(__name__)
-f = Feed()
+
 @app.route("/")
 def helo():
+    doc = Document()
+    f = Feed(doc)
     #f.cleanDoc()
     f.addEntry("ttt", "uuu", "iddd", "content...",
                {Link("xxx", "xxx", "aaa", "jpg"), Link("mm", "mm", "mm", "xml")})

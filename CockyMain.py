@@ -56,7 +56,8 @@ class Feed:
         return link
 
     def cleanDoc(self):
-        self.doc = Document()
+        #self.doc = Document()
+        self.doc.removeChild()
 
 class Link:
     def __init__(self, href, rel, title, type):
