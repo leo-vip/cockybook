@@ -1,7 +1,7 @@
 from xml.dom.minidom import Document
 from flask import Flask
-from OpdsCore import Feed, Link
-from Protocols import BaiduOpdsFileSystem
+from OpdsCore import FeedDoc, Link, OpdsProtocol
+from Protocols import LocalOpdsProtocol
 
 
 __author__ = 'lei'
@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def helo():
-    f = Feed(Document())
+    f = FeedDoc(Document())
 
     f.createEntry("halo,OPds", "2014-12-11T07:10:23Z", "1234567890", "This is halo Opds Describe...",
                   {Link("http://www.baidu.com", "xxx", "aaa",
@@ -21,13 +21,11 @@ def helo():
     return f.toString() + "\n"
 
 
-@app.route('/lists/<path:path>')
-def list(path):
-    feed = Feed(Document())
-    opdsProt = getOpdsProtocol(feed, file)
-    opdsProt
-    return feed.toString()
+@app.route('/list/<path:path>')
+def listbooks(path):
+    feed = FeedDoc(Document())
 
+    return getOpdsProtocol().listBooks(feed, path)
 
 @app.route('/download/<path:path>')
 def download(path):
@@ -37,13 +35,13 @@ def download(path):
     return "fileContent: " + path
 
 
-@app.route('show/<path:path>')
+@app.route('/show/<path:path>')
 def showhtml(path):
     return "show file:" + path
 
 
-def getOpdsProtocol(feed, path):
-    return BaiduOpdsFileSystem(feed, path)
+def getOpdsProtocol():
+    return LocalOpdsProtocol()
 
 
 if __name__ == "__main__":

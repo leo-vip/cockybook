@@ -1,17 +1,31 @@
 from OpdsCore import OpdsProtocol
-
+import os,sys
 __author__ = 'lei'
 
-class BaiduOpdsFileSystem(OpdsProtocol):
+base="c://"
+
+class LocalOpdsProtocol(OpdsProtocol):
+    """
+    All Opds File System Must Realized this Class
+    """
 
     def listBooks(self):
-        print("No Realized")
+        """
+        :return: {entiry ...}
+        """
+        ldir=os.listdir(base)
+        for f in ldir:
+
+            #TODO xx
+
+        return ("No Realized")
         pass
 
     def dowloadBook(self):
-        print("No Realized")
+        return ("No Realized")
         pass
 
     def showhtml(self):
-        print("No Realized")
+        return ("No Realized")
         pass
+

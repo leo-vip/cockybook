@@ -5,20 +5,23 @@ import Const
 
 __author__ = 'lei'
 
+
 def setfeedNS(feed):
-    feed.setAttribute("xmlns:app","http://www.w3.org/2007/app")
-    feed.setAttribute("xmlns:opds","http://opds-spec.org/2010/catalog")
-    feed.setAttribute("xmlns:opds",Config.SITE_URL)
-    feed.setAttribute("xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance")
-    feed.setAttribute("xmlns","http://www.w3.org/2005/Atom")
-    feed.setAttribute("xmlns:dcterms","http://purl.org/dc/terms/")
-    feed.setAttribute("xmlns:thr","http://purl.org/syndication/thread/1.0")
-    feed.setAttribute("xmlns:opensearch","http://a9.com/-/spec/opensearch/1.1/")
+    feed.setAttribute("xmlns:app", "http://www.w3.org/2007/app")
+    feed.setAttribute("xmlns:opds", "http://opds-spec.org/2010/catalog")
+    feed.setAttribute("xmlns:opds", Config.SITE_URL)
+    feed.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
+    feed.setAttribute("xmlns", "http://www.w3.org/2005/Atom")
+    feed.setAttribute("xmlns:dcterms", "http://purl.org/dc/terms/")
+    feed.setAttribute("xmlns:thr", "http://purl.org/syndication/thread/1.0")
+    feed.setAttribute("xmlns:opensearch", "http://a9.com/-/spec/opensearch/1.1/")
+
 
 def getNow():
     return datetime.datetime.now().strftime("%Y-%m-%dT%I:%M:%SZ")
 
-class Feed:
+
+class FeedDoc:
     def __init__(self, doc):
         """
         Root Element
@@ -31,10 +34,10 @@ class Feed:
         self.addNode(self.feed, Const.id, Config.SITE_URL)
         self.addNode(self.feed, Const.author, Config.SITE_EMAIL)
         self.addNode(self.feed, Const.title, Config.SITE_TITLE)
-        self.addNode(self.feed, Const.updated,getNow())
-        self.createLink(self.feed,"http://opds.cockybook.com/aa","aa","aa","application/atom+xml; profile=opds-catalog; kind=navigation")
-        self.createLink(self.feed,"http://opds.cockybook.com/bb","bb","bb","application/atom+xml; profile=opds-catalog; kind=navigation")
-        self.createLink(self.feed,"http://opds.cockybook.com/cc","cc","cc","application/atom+xml; profile=opds-catalog; kind=navigation")
+        self.addNode(self.feed, Const.updated, getNow())
+        self.createLink(self.feed, "http://opds.cockybook.com/", "Home", "Home",
+                        "application/atom+xml; profile=opds-catalog; kind=navigation")
+
         self.doc.appendChild(self.feed)
         pass
 
@@ -47,7 +50,7 @@ class Feed:
         :param link:  if is link ,this field is Not None.
         :return:
         """
-        if isinstance(value,Element):
+        if isinstance(value, Element):
             element.appendChild(value)
         else:
             node = self.doc.createElement(key)
@@ -55,7 +58,7 @@ class Feed:
             element.appendChild(node)
 
     def toString(self):
-        #return self.doc.toxml("utf-8")
+        # return self.doc.toxml("utf-8")
         return self.doc.toprettyxml(encoding="utf-8")
 
     def createEntry(self, title=None, updated=None, idd=None, content=None, links={}):
@@ -70,18 +73,28 @@ class Feed:
 
     def createLink(self, entry, href, rel, title, type):
         link = self.doc.createElement(Const.link)
-        link.setAttribute("type", type)
         link.setAttribute("href", href)
         link.setAttribute("rel", rel)
         link.setAttribute("title", title)
+        link.setAttribute("type", type)
         entry.appendChild(link)
         return link
+
+class Entry:
+    def __init__(self, title=None, updated=None, id=None, content=None, links={}):
+        self.links = links
+        self.content = content
+        self.id = id
+        self.updated = updated
+        self.title = title
+
 
 
 class Link:
     """
     Link Entity
     """
+
     def __init__(self, href, rel, title, type):
         self.href = href
         self.rel = rel
@@ -90,25 +103,23 @@ class Link:
 
 
 class OpdsProtocol:
-
     """
     All Opds File System Must Realized this Class
     """
-    def __init__(self,feed,path):
-        self.feed=feed
-        self.path=path
 
     def listBooks(self):
-        print("No Realized")
+        """
+        :return: {entiry ...}
+        """
+
+        return ("No Realized")
         pass
 
     def dowloadBook(self):
-        print("No Realized")
+        return ("No Realized")
         pass
 
     def showhtml(self):
-        print("No Realized")
+        return ("No Realized")
         pass
 
-
-# if __name__ == '__main__':
