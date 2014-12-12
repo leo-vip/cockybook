@@ -1,5 +1,6 @@
+#coding: UTF-8
 from xml.dom.minidom import Document
-from flask import Flask
+from flask import Flask,url_for
 from OpdsCore import FeedDoc, Link, OpdsProtocol
 from Protocols import LocalOpdsProtocol
 
@@ -13,19 +14,29 @@ app = Flask(__name__)
 def helo():
     f = FeedDoc(Document())
 
-    f.createEntry("halo,OPds", "2014-12-11T07:10:23Z", "1234567890", "This is halo Opds Describe...",
-                  {Link("http://www.baidu.com", "xxx", "aaa",
-                        "application/atom+xml;profile=opds-catalog;kind=acquisition"),
-                   Link("http://163.com", "mm", "mm", "application/atom+xml;profile=opds-catalog;kind=acquisition")})
+    #f.createEntry("halo,OPds", "2014-12-11T07:10:23Z", "1234567890", "This is halo Opds Describe...",
+     #             {Link("http://www.baidu.com", "xxx", "aaa",
+     #                   "application/atom+xml;profile=opds-catalog;kind=acquisition"),
+     #              Link("http://163.com", "mm", "mm", "application/atom+xml;profile=opds-catalog;kind=acquisition")})
 
     return f.toString() + "\n"
+
+@app.route('/list')
+def listbookroot():
+    return listbooks('/')
 
 
 @app.route('/list/<path:path>')
 def listbooks(path):
     feed = FeedDoc(Document())
+    #TODO add *** to feed.toString()
+    l=getOpdsProtocol().listBooks(path)
 
-    return getOpdsProtocol().listBooks(feed, path)
+    for entry in l:
+        feed.createEntry(entry)
+
+    print(feed.toString().encode("utf-8"))
+    return feed.toString()
 
 @app.route('/download/<path:path>')
 def download(path):

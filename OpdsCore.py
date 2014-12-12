@@ -1,3 +1,4 @@
+#coding: UTF-8
 from xml.dom.minidom import Document, Text, Element
 import datetime
 import Config
@@ -59,17 +60,18 @@ class FeedDoc:
 
     def toString(self):
         # return self.doc.toxml("utf-8")
-        return self.doc.toprettyxml(encoding="utf-8")
+        return self.doc.toprettyxml()
 
-    def createEntry(self, title=None, updated=None, idd=None, content=None, links={}):
-        entry = self.doc.createElement(Const.entry)
-        self.addNode(entry, Const.entry_title, title)
-        self.addNode(entry, Const.entry_updated, updated)
-        self.addNode(entry, Const.entry_id, idd)
-        self.addNode(entry, Const.entry_content, content)
-        for link in links:
-            self.createLink(entry, link.href, link.rel, link.title, link.type)
-        self.feed.appendChild(entry)
+    def createEntry(self, entry):
+        entryNode = self.doc.createElement(Const.entry)
+
+        self.addNode(entryNode, Const.entry_title, entry.title)
+        self.addNode(entryNode, Const.entry_updated, entry.updated)
+        self.addNode(entryNode, Const.entry_id, entry.id)
+        self.addNode(entryNode, Const.entry_content, entry.content)
+        for link in entry.links:
+            self.createLink(entryNode, link.href, link.rel, link.title, link.type)
+        self.feed.appendChild(entryNode)
 
     def createLink(self, entry, href, rel, title, type):
         link = self.doc.createElement(Const.link)
@@ -81,7 +83,7 @@ class FeedDoc:
         return link
 
 class Entry:
-    def __init__(self, title=None, updated=None, id=None, content=None, links={}):
+    def __init__(self, title=None, updated=None, id=None, content=None, links=[]):
         self.links = links
         self.content = content
         self.id = id

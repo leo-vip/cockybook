@@ -1,3 +1,4 @@
+#coding: UTF-8
 __author__ = 'lei'
 
 
@@ -8,6 +9,7 @@ updated = "updated"
 icon = "icon"
 author = "author"
 link = "link"
+
 #####################
 
 entry = "entry"
@@ -28,5 +30,7 @@ book_type_picture = "image/jpeg"
 book_type_html = "text/html"
 book_type_entry_catalog = "application/atom+xml;type=entry;profile=opds-catalog"
 
+######book_link_type
+book_link_rel_subsection="subsection"
 
 
