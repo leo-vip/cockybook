@@ -24,7 +24,7 @@ def create_entry(file_path,path,name):
 
     entry.updated=getCreateDate(file_path)
     #TODO add Another Links
-    entry.links=[Link(entry.id,name,Const.book_link_rel_subsection,_get_book_entry_type(name))]
+    entry.links=[Link(entry.id,Const.book_link_rel_subsection,name,_get_book_entry_type(name))]
     return entry
 
 def _get_book_entry_type(name):
@@ -68,6 +68,7 @@ class LocalOpdsProtocol(OpdsProtocol):
             return l
 
         for name in os.listdir(distPath):
+            name= name.decode("gbk")
             file_path = os.path.join(distPath, name)
             if (os.path.isfile(file_path)):
                 print("file: " + file_path)
@@ -93,6 +94,5 @@ if __name__ == "__main__":
     # getCreateDate("f:\\opds")
     # print("我擦。。。。")
 
-    print(sys.getfilesystemencoding())
     for f in os.listdir(base):
-        print(f)
+        print(f.decode("GBK"))

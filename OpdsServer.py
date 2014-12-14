@@ -1,8 +1,11 @@
 #coding: UTF-8
+
 from xml.dom.minidom import Document
 from flask import Flask,url_for
-from OpdsCore import FeedDoc, Link, OpdsProtocol
+import Const
+from OpdsCore import FeedDoc, Link, OpdsProtocol, Entry, getNow
 from Protocols import LocalOpdsProtocol
+import Config
 
 
 __author__ = 'lei'
@@ -13,6 +16,17 @@ app = Flask(__name__)
 @app.route("/")
 def helo():
     f = FeedDoc(Document())
+
+    entry = Entry()
+    entry.id=Config.SITE_BOOK_LIST
+    entry.content="all Books List By Type"
+    entry.title="Book List"
+
+    entry.updated=getNow()
+    #TODO add Another Links
+    entry.links=[Link(entry.id,Const.book_link_rel_subsection,"Book List",Const.book_type_entry_catalog)]
+    f.createEntry(entry)
+    return f.toString()
 
     #f.createEntry("halo,OPds", "2014-12-11T07:10:23Z", "1234567890", "This is halo Opds Describe...",
      #             {Link("http://www.baidu.com", "xxx", "aaa",

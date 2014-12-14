@@ -36,7 +36,7 @@ class FeedDoc:
         self.addNode(self.feed, Const.author, Config.SITE_EMAIL)
         self.addNode(self.feed, Const.title, Config.SITE_TITLE)
         self.addNode(self.feed, Const.updated, getNow())
-        self.createLink(self.feed, "http://opds.cockybook.com/", "Home", "Home",
+        self.createLink(self.feed, Config.SITE_URL, "Home", "Home",
                         "application/atom+xml; profile=opds-catalog; kind=navigation")
 
         self.doc.appendChild(self.feed)
