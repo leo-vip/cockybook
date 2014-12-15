@@ -56,7 +56,9 @@ def listbooks(path):
 def download(path):
     """
     download book
+
     """
+    getOpdsProtocol().dowloadBook(path)
     return "fileContent: " + path
 
 

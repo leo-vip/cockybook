@@ -1,5 +1,6 @@
-#coding: UTF-8
+# coding: UTF-8
 import datetime
+import Config
 import Const
 from OpdsCore import OpdsProtocol, Entry, Link
 import os, sys
@@ -8,7 +9,6 @@ __author__ = 'lei'
 
 base = "f:\\opds"
 
-dowloadUrl="http://localhost:5000/download"
 
 
 def getCreateDate(file_path):
@@ -16,16 +16,17 @@ def getCreateDate(file_path):
     return datetime.datetime.now().strftime("%Y-%m-%dT%I:%M:%SZ")
 
 
-def create_entry(file_path,path,name):
+def create_entry(file_path, path, name):
     entry = Entry()
-    entry.id=os.path.join(dowloadUrl,name)
-    entry.content=name
-    entry.title=name
+    entry.id = os.path.join(Config.SITE_BOOK_DONWLOAD+"/"+path, name)
+    entry.content = name
+    entry.title = name
 
-    entry.updated=getCreateDate(file_path)
+    entry.updated = getCreateDate(file_path)
     #TODO add Another Links
-    entry.links=[Link(entry.id,Const.book_link_rel_subsection,name,_get_book_entry_type(name))]
+    entry.links = [Link(entry.id, Const.book_link_rel_subsection, name, _get_book_entry_type(name))]
     return entry
+
 
 def _get_book_entry_type(name):
     """
@@ -33,7 +34,7 @@ def _get_book_entry_type(name):
     """
     if name.endswith(".pdf"):
         return Const.book_type_pdf
-    elif  name.endswith(".epub"):
+    elif name.endswith(".epub"):
         return Const.book_type_epub
     elif name.endswith(".jpg"):
         return Const.book_type_picture
@@ -42,6 +43,7 @@ def _get_book_entry_type(name):
     else:
         # No subifx
         return Const.book_type_entry_catalog
+
 
 class LocalOpdsProtocol(OpdsProtocol):
     """
@@ -58,7 +60,7 @@ class LocalOpdsProtocol(OpdsProtocol):
             distPath = os.path.join(base, path)
         else:
             distPath = base
-         #not exist!
+            #not exist!
         if (not os.path.exists(distPath)):
             print("dest Path [%s] is Not Exist." % distPath)
             return l
@@ -68,19 +70,28 @@ class LocalOpdsProtocol(OpdsProtocol):
             return l
 
         for name in os.listdir(distPath):
-            name= name.decode("gbk")
+            name = name.decode("gbk")
             file_path = os.path.join(distPath, name)
             if (os.path.isfile(file_path)):
                 print("file: " + file_path)
-                l.append(create_entry(file_path,path,name))
+                l.append(create_entry(file_path, path, name))
             else:
                 print("Dir: " + file_path)
-                l.append(create_entry(file_path,path,name))
+                l.append(create_entry(file_path, path, name))
 
         return l
 
-    def dowloadBook(self):
-        return ("No Realized")
+    def dowloadBook(self, path):
+        """
+        file
+        :param path:
+        :return: file
+        """
+
+        file=open(os.path.join(base, path))
+
+
+        return file
         pass
 
     def showhtml(self):

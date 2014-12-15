@@ -117,7 +117,8 @@ class OpdsProtocol:
         return ("No Realized")
         pass
 
-    def dowloadBook(self):
+    def dowloadBook(self, path):
+        
         return ("No Realized")
         pass
 
