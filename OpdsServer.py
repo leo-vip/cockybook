@@ -1,7 +1,7 @@
 #coding: UTF-8
 
 from xml.dom.minidom import Document
-from flask import Flask,url_for
+from flask import Flask,url_for,send_file
 import Const
 from OpdsCore import FeedDoc, Link, OpdsProtocol, Entry, getNow
 from Protocols import LocalOpdsProtocol
@@ -49,7 +49,7 @@ def listbooks(path):
     for entry in l:
         feed.createEntry(entry)
 
-    print(feed.toString().encode("utf-8"))
+    #print(feed.toString().encode("utf-8"))
     return feed.toString()
 
 @app.route('/download/<path:path>')
@@ -58,8 +58,9 @@ def download(path):
     download book
 
     """
-    getOpdsProtocol().dowloadBook(path)
-    return "fileContent: " + path
+    filePath=getOpdsProtocol().dowloadBook(path)
+
+    return send_file(filePath)
 
 
 @app.route('/show/<path:path>')

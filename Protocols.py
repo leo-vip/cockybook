@@ -9,6 +9,15 @@ __author__ = 'lei'
 
 base = "f:\\opds"
 
+##connect path
+def _connect_path(base,name):
+    if name.startswith('/'):
+        name=name[1:]
+
+    if base.endswith('/'):
+        return base+name
+    else:
+        return base + '/' +name
 
 
 def getCreateDate(file_path):
@@ -16,9 +25,12 @@ def getCreateDate(file_path):
     return datetime.datetime.now().strftime("%Y-%m-%dT%I:%M:%SZ")
 
 
-def create_entry(file_path, path, name):
+def create_entry(file_path, isFile, path, name):
     entry = Entry()
-    entry.id = os.path.join(Config.SITE_BOOK_DONWLOAD+"/"+path, name)
+    if isFile :
+        entry.id = _connect_path(_connect_path(Config.SITE_BOOK_DONWLOAD, path), name)
+    else:
+        entry.id = _connect_path(Config.SITE_BOOK_LIST+path, name)
     entry.content = name
     entry.title = name
 
@@ -40,6 +52,10 @@ def _get_book_entry_type(name):
         return Const.book_type_picture
     elif name.endswith(".mobi"):
         return Const.book_type_mobi
+    elif name.endswith(".txt"):
+        return Const.book_type_text
+    elif name.find('.')!=-1:
+        return Const.book_type_content
     else:
         # No subifx
         return Const.book_type_entry_catalog
@@ -70,14 +86,17 @@ class LocalOpdsProtocol(OpdsProtocol):
             return l
 
         for name in os.listdir(distPath):
-            name = name.decode("gbk")
+            try:
+                name = name.decode("gbk")
+            except UnicodeEncodeError:
+                name=unicode(name)
             file_path = os.path.join(distPath, name)
             if (os.path.isfile(file_path)):
-                print("file: " + file_path)
-                l.append(create_entry(file_path, path, name))
+                #print("file: " + file_path)
+                l.append(create_entry(file_path, True, path, name))
             else:
-                print("Dir: " + file_path)
-                l.append(create_entry(file_path, path, name))
+                #print("Dir: " + file_path)
+                l.append(create_entry(file_path, False, path, name))
 
         return l
 
@@ -88,11 +107,8 @@ class LocalOpdsProtocol(OpdsProtocol):
         :return: file
         """
 
-        file=open(os.path.join(base, path))
+        return os.path.join(base, path)
 
-
-        return file
-        pass
 
     def showhtml(self):
         return ("No Realized")
