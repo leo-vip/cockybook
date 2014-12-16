@@ -7,7 +7,8 @@ import os, sys
 
 __author__ = 'lei'
 
-base = "f:\\opds"
+#base = "f:\\opds"
+base="/home/cocky"
 
 ##connect path
 def _connect_path(base,name):
@@ -30,7 +31,7 @@ def create_entry(file_path, isFile, path, name):
     if isFile :
         entry.id = _connect_path(_connect_path(Config.SITE_BOOK_DONWLOAD, path), name)
     else:
-        entry.id = _connect_path(Config.SITE_BOOK_LIST+path, name)
+        entry.id = _connect_path(_connect_path(Config.SITE_BOOK_LIST, path), name)
     entry.content = name
     entry.title = name
 
@@ -73,7 +74,7 @@ class LocalOpdsProtocol(OpdsProtocol):
         l = []
 
         if (path != "/"):
-            distPath = os.path.join(base, path)
+            distPath = _connect_path(base, path)
         else:
             distPath = base
             #not exist!
@@ -87,10 +88,13 @@ class LocalOpdsProtocol(OpdsProtocol):
 
         for name in os.listdir(distPath):
             try:
-                name = name.decode("gbk")
-            except UnicodeEncodeError:
-                name=unicode(name)
-            file_path = os.path.join(distPath, name)
+                name = name.decode("utf8")
+            except UnicodeDecodeError:
+                name=name.decode("gbk")
+                pass
+            
+            
+            file_path = _connect_path(distPath, name)
             if (os.path.isfile(file_path)):
                 #print("file: " + file_path)
                 l.append(create_entry(file_path, True, path, name))
@@ -121,5 +125,11 @@ if __name__ == "__main__":
     # getCreateDate("f:\\opds")
     # print("我擦。。。。")
 
-    for f in os.listdir(base):
-        print(f.decode("GBK"))
+#     for f in os.listdir(base):
+#         print(f.decode("utf-8"))
+        m={}
+        m['sss']=["a","b"]
+        m['sss'].append('c')
+        
+        for ii in m:
+            print m[ii]
