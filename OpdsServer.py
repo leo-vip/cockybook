@@ -4,7 +4,7 @@ from xml.dom.minidom import Document
 from flask import Flask,url_for,send_file
 import Const
 from OpdsCore import FeedDoc, Link, OpdsProtocol, Entry, getNow
-from Protocols import LocalOpdsProtocol
+
 import Config
 
 
@@ -69,7 +69,7 @@ def showhtml(path):
 
 
 def getOpdsProtocol():
-    return LocalOpdsProtocol()
+    return OpdsProtocol()
 
 
 if __name__ == "__main__":

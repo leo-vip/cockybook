@@ -3,6 +3,8 @@ from xml.dom.minidom import Document, Text, Element
 import datetime
 import Config
 import Const
+from Config import fs
+from filesystem import FileSystem, LocalFileSystem
 
 __author__ = 'lei'
 
@@ -20,6 +22,56 @@ def setfeedNS(feed):
 
 def getNow():
     return datetime.datetime.now().strftime("%Y-%m-%dT%I:%M:%SZ")
+##connect path
+def connect_path(base,name):
+    if name.startswith('/'):
+        name=name[1:]
+
+    if base.endswith('/'):
+        return base+name
+    else:
+        return base + '/' +name
+
+
+def getCreateDate(file_path):
+    #return datetime.datetime.now(os.path.getctime(file_path)).strftime("%Y-%m-%dT%I:%M:%SZ")
+    return datetime.datetime.now().strftime("%Y-%m-%dT%I:%M:%SZ")
+
+
+def create_entry(file_path, isFile, path, name):
+    entry = Entry()
+    if isFile :
+        entry.id = fs.getdownloadurl(path,name)
+        #
+    else:
+        entry.id = connect_path(connect_path(Config.SITE_BOOK_LIST, path), name)
+    entry.content = name
+    entry.title = name
+
+    entry.updated = getCreateDate(file_path)
+    #TODO add Another Links
+    entry.links = [Link(entry.id, Const.book_link_rel_subsection, name, _get_book_entry_type(name))]
+    return entry
+
+def _get_book_entry_type(name):
+    """
+    get link type
+    """
+    if name.endswith(".pdf"):
+        return Const.book_type_pdf
+    elif name.endswith(".epub"):
+        return Const.book_type_epub
+    elif name.endswith(".jpg"):
+        return Const.book_type_picture
+    elif name.endswith(".mobi"):
+        return Const.book_type_mobi
+    elif name.endswith(".txt"):
+        return Const.book_type_text
+    elif name.find('.')!=-1:
+        return Const.book_type_content
+    else:
+        # No subifx
+        return Const.book_type_entry_catalog
 
 
 class FeedDoc:
@@ -104,25 +156,82 @@ class Link:
         self.type = type
 
 
+#########################
+
+
+
 class OpdsProtocol:
     """
     All Opds File System Must Realized this Class
     """
 
-    def listBooks(self):
+    def listBooks(self, path):
         """
         :return: {entiry ...}
         """
+        rslist = []
 
-        return ("No Realized")
-        pass
+        if (path != "/"):
+            distPath = connect_path(Config.base, path)
+        else:
+            distPath = Config.base
+            #not exist!
+        if (not fs.exists(distPath)):
+            print("dest Path [%s] is Not Exist." % distPath)
+            return rslist
+
+        if (fs.isfile(distPath)):
+            print("dest Path is a File Not Right." % distPath)
+            return rslist
+
+        bookmap={}
+        for name in fs.listdir(distPath):
+            try:
+                name = name.decode("utf-8")
+            except Exception:
+                try:
+                    name=name.decode("gbk")
+                except Exception as e:
+                    pass
+
+            file_path = connect_path(distPath, name)
+            if (fs.isfile(file_path)):
+                #print("file: " + file_path)
+                rslist.append(create_entry(file_path, True, path, name))
+            else:
+                #print("Dir: " + file_path)
+                rslist.append(create_entry(file_path, False, path, name))
+        return rslist
+
 
     def dowloadBook(self, path):
-        
-        return ("No Realized")
-        pass
+        """
+        file
+        :param path:
+        :return: file
+        """
+
+        return connect_path(Config.base, path)
+
 
     def showhtml(self):
         return ("No Realized")
         pass
 
+class FileSystem:
+    def outErr(self):
+        print("No Realyzed")
+
+    def exists(self,path):
+        self.outErr()
+        pass
+    def isfile(self,path):
+        self.outErr()
+        pass
+    def listdir(self,path):
+        self.outErr()
+        return []
+        pass
+    def getdownloadurl(self,path,name):
+        self.outErr()
+        return ""
