@@ -3,11 +3,15 @@ from xml.dom.minidom import Document, Text, Element
 import datetime
 import Config
 import Const
-from Config import fs
-from filesystem import FileSystem, LocalFileSystem
+from filesystem import LocalFileSystem, QiniuFileSystem
+import utils
+
 
 __author__ = 'lei'
-
+if Config.filesyste_type =='LocalFileSystem':
+    fs =LocalFileSystem()
+else:
+    fs=QiniuFileSystem()
 
 def setfeedNS(feed):
     feed.setAttribute("xmlns:app", "http://www.w3.org/2007/app")
@@ -20,17 +24,6 @@ def setfeedNS(feed):
     feed.setAttribute("xmlns:opensearch", "http://a9.com/-/spec/opensearch/1.1/")
 
 
-def getNow():
-    return datetime.datetime.now().strftime("%Y-%m-%dT%I:%M:%SZ")
-##connect path
-def connect_path(base,name):
-    if name.startswith('/'):
-        name=name[1:]
-
-    if base.endswith('/'):
-        return base+name
-    else:
-        return base + '/' +name
 
 
 def getCreateDate(file_path):
@@ -38,17 +31,17 @@ def getCreateDate(file_path):
     return datetime.datetime.now().strftime("%Y-%m-%dT%I:%M:%SZ")
 
 
-def create_entry(file_path, isFile, path, name):
+def create_entry(isFile, path, name):
     entry = Entry()
     if isFile :
         entry.id = fs.getdownloadurl(path,name)
         #
     else:
-        entry.id = connect_path(connect_path(Config.SITE_BOOK_LIST, path), name)
+        entry.id = utils.connect_path(utils.connect_path(Config.SITE_BOOK_LIST, path), name)
     entry.content = name
     entry.title = name
 
-    entry.updated = getCreateDate(file_path)
+    entry.updated = utils.getNow()
     #TODO add Another Links
     entry.links = [Link(entry.id, Const.book_link_rel_subsection, name, _get_book_entry_type(name))]
     return entry
@@ -87,7 +80,7 @@ class FeedDoc:
         self.addNode(self.feed, Const.id, Config.SITE_URL)
         self.addNode(self.feed, Const.author, Config.SITE_EMAIL)
         self.addNode(self.feed, Const.title, Config.SITE_TITLE)
-        self.addNode(self.feed, Const.updated, getNow())
+        self.addNode(self.feed, Const.updated, utils.getNow())
         self.createLink(self.feed, Config.SITE_URL, "Home", "Home",
                         "application/atom+xml; profile=opds-catalog; kind=navigation")
 
@@ -171,21 +164,17 @@ class OpdsProtocol:
         """
         rslist = []
 
-        if (path != "/"):
-            distPath = connect_path(Config.base, path)
-        else:
-            distPath = Config.base
             #not exist!
-        if (not fs.exists(distPath)):
-            print("dest Path [%s] is Not Exist." % distPath)
+        if (not fs.exists(path)):
+            print("dest Path [%s] is Not Exist." % path)
             return rslist
 
-        if (fs.isfile(distPath)):
-            print("dest Path is a File Not Right." % distPath)
+        if (fs.isfile(path)):
+            print("dest Path is a File Not Right." % path)
             return rslist
 
         bookmap={}
-        for name in fs.listdir(distPath):
+        for name in fs.listdir(path):
             try:
                 name = name.decode("utf-8")
             except Exception:
@@ -194,13 +183,13 @@ class OpdsProtocol:
                 except Exception as e:
                     pass
 
-            file_path = connect_path(distPath, name)
+            file_path = utils.connect_path(path, name)
             if (fs.isfile(file_path)):
                 #print("file: " + file_path)
-                rslist.append(create_entry(file_path, True, path, name))
+                rslist.append(create_entry(True, path, name))
             else:
                 #print("Dir: " + file_path)
-                rslist.append(create_entry(file_path, False, path, name))
+                rslist.append(create_entry(False, path, name))
         return rslist
 
 
@@ -211,27 +200,9 @@ class OpdsProtocol:
         :return: file
         """
 
-        return connect_path(Config.base, path)
+        return utils.connect_path(Config.base, path)
 
 
     def showhtml(self):
         return ("No Realized")
         pass
-
-class FileSystem:
-    def outErr(self):
-        print("No Realyzed")
-
-    def exists(self,path):
-        self.outErr()
-        pass
-    def isfile(self,path):
-        self.outErr()
-        pass
-    def listdir(self,path):
-        self.outErr()
-        return []
-        pass
-    def getdownloadurl(self,path,name):
-        self.outErr()
-        return ""

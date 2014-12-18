@@ -3,15 +3,16 @@
 from xml.dom.minidom import Document
 from flask import Flask,url_for,send_file
 import Const
-from OpdsCore import FeedDoc, Link, OpdsProtocol, Entry, getNow
+from opdscore import FeedDoc, Link, OpdsProtocol, Entry
 
 import Config
+from filesystem import LocalFileSystem
+import utils
 
 
 __author__ = 'lei'
 
 app = Flask(__name__)
-
 
 @app.route("/")
 def helo():
@@ -22,7 +23,7 @@ def helo():
     entry.content="all Books List By Type"
     entry.title="Book List"
 
-    entry.updated=getNow()
+    entry.updated=utils.getNow()
     #TODO add Another Links
     entry.links=[Link(entry.id,Const.book_link_rel_subsection,"Book List",Const.book_type_entry_catalog)]
     f.createEntry(entry)
