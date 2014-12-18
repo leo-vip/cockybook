@@ -1,12 +1,12 @@
-#coding: UTF-8
+# coding: UTF-8
 
 from xml.dom.minidom import Document
-from flask import Flask,url_for,send_file
+from flask import Flask, send_file
 import Const
 from opdscore import FeedDoc, Link, OpdsProtocol, Entry
 
 import Config
-from filesystem import LocalFileSystem
+
 import utils
 
 
@@ -14,27 +14,29 @@ __author__ = 'lei'
 
 app = Flask(__name__)
 
+
 @app.route("/")
 def helo():
     f = FeedDoc(Document())
 
     entry = Entry()
-    entry.id=Config.SITE_BOOK_LIST
-    entry.content="all Books List By Type"
-    entry.title="Book List"
+    entry.id = Config.SITE_BOOK_LIST
+    entry.content = "all Books List By Type"
+    entry.title = "Book List"
 
-    entry.updated=utils.getNow()
+    entry.updated = utils.getNow()
     #TODO add Another Links
-    entry.links=[Link(entry.id,Const.book_link_rel_subsection,"Book List",Const.book_type_entry_catalog)]
+    entry.links = [Link(entry.id, Const.book_link_rel_subsection, "Book List", Const.book_type_entry_catalog)]
     f.createEntry(entry)
     return f.toString()
 
     #f.createEntry("halo,OPds", "2014-12-11T07:10:23Z", "1234567890", "This is halo Opds Describe...",
-     #             {Link("http://www.baidu.com", "xxx", "aaa",
-     #                   "application/atom+xml;profile=opds-catalog;kind=acquisition"),
-     #              Link("http://163.com", "mm", "mm", "application/atom+xml;profile=opds-catalog;kind=acquisition")})
+    #             {Link("http://www.baidu.com", "xxx", "aaa",
+    #                   "application/atom+xml;profile=opds-catalog;kind=acquisition"),
+    #              Link("http://163.com", "mm", "mm", "application/atom+xml;profile=opds-catalog;kind=acquisition")})
 
     return f.toString() + "\n"
+
 
 @app.route('/list')
 def listbookroot():
@@ -45,21 +47,22 @@ def listbookroot():
 def listbooks(path):
     feed = FeedDoc(Document())
     #TODO add *** to feed.toString()
-    l=getOpdsProtocol().listBooks(path)
+    l = getOpdsProtocol().listBooks(path)
 
     for entry in l:
         feed.createEntry(entry)
 
     #print(feed.toString().encode("utf-8"))
     return feed.toString()
- 
+
+
 @app.route('/download/<path:path>')
 def download(path):
     """
     download book
 
     """
-    filePath=getOpdsProtocol().dowloadBook(path)
+    filePath = getOpdsProtocol().dowloadBook(path)
 
     return send_file(filePath)
 
