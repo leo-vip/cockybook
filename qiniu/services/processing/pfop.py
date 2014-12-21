@@ -5,7 +5,6 @@ from qiniu import http
 
 
 class PersistentFop(object):
-
     def __init__(self, auth, bucket, pipeline=None, notify_url=None):
         self.auth = auth
         self.bucket = bucket

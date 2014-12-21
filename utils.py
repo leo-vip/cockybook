@@ -4,15 +4,15 @@ __author__ = 'lei'
 
 
 
-##connect path
-def connect_path(base,name):
+# #connect path
+def connect_path(base, name):
     if name.startswith('/'):
-        name=name[1:]
+        name = name[1:]
 
     if base.endswith('/'):
-        return base+name
+        return base + name
     else:
-        return base + '/' +name
+        return base + '/' + name
 
 
 def getNow():

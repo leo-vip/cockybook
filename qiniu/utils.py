@@ -9,6 +9,7 @@ from .compat import b, s
 
 try:
     import zlib
+
     binascii = zlib
 except ImportError:
     zlib = None

@@ -20,7 +20,7 @@ except (ImportError, SyntaxError):
 
 _ver = sys.version_info
 
-#: Python 2.x?
+# : Python 2.x?
 is_py2 = (_ver[0] == 2)
 
 #: Python 3.x?
@@ -34,6 +34,7 @@ is_py3 = (_ver[0] == 3)
 if is_py2:
     from urlparse import urlparse  # noqa
     import StringIO
+
     StringIO = BytesIO = StringIO.StringIO
 
     builtin_str = str
@@ -54,6 +55,7 @@ if is_py2:
 elif is_py3:
     from urllib.parse import urlparse  # noqa
     import io
+
     StringIO = io.StringIO
     BytesIO = io.BytesIO
 

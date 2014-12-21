@@ -1,7 +1,5 @@
-#coding: UTF-8
+# coding: UTF-8
 __author__ = 'lei'
-
-
 
 id = "id"
 title = "title"
@@ -33,6 +31,6 @@ book_type_content = "text"
 book_type_entry_catalog = "application/atom+xml;type=entry;profile=opds-catalog"
 
 ######book_link_type
-book_link_rel_subsection="subsection"
+book_link_rel_subsection = "subsection"
 
 

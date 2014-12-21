@@ -25,7 +25,7 @@ def helo():
     entry.title = "Book List"
 
     entry.updated = utils.getNow()
-    #TODO add Another Links
+    # TODO add Another Links
     entry.links = [Link(entry.id, Const.book_link_rel_subsection, "Book List", Const.book_type_entry_catalog)]
     f.createEntry(entry)
     return f.toString()
@@ -46,7 +46,7 @@ def listbookroot():
 @app.route('/list/<path:path>')
 def listbooks(path):
     feed = FeedDoc(Document())
-    #TODO add *** to feed.toString()
+    # TODO add *** to feed.toString()
     l = getOpdsProtocol().listBooks(path)
 
     for entry in l:

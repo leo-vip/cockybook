@@ -1,4 +1,4 @@
-#coding: UTF-8
+# coding: UTF-8
 from xml.dom.minidom import Document, Text, Element
 import datetime
 import Config
@@ -8,10 +8,11 @@ import utils
 
 
 __author__ = 'lei'
-if Config.filesyste_type =='LocalFileSystem':
-    fs =LocalFileSystem()
+if Config.filesyste_type == 'LocalFileSystem':
+    fs = LocalFileSystem()
 else:
-    fs=QiniuFileSystem()
+    fs = QiniuFileSystem()
+
 
 def setfeedNS(feed):
     feed.setAttribute("xmlns:app", "http://www.w3.org/2007/app")
@@ -24,8 +25,6 @@ def setfeedNS(feed):
     feed.setAttribute("xmlns:opensearch", "http://a9.com/-/spec/opensearch/1.1/")
 
 
-
-
 def getCreateDate(file_path):
     #return datetime.datetime.now(os.path.getctime(file_path)).strftime("%Y-%m-%dT%I:%M:%SZ")
     return datetime.datetime.now().strftime("%Y-%m-%dT%I:%M:%SZ")
@@ -33,8 +32,8 @@ def getCreateDate(file_path):
 
 def create_entry(isFile, path, name):
     entry = Entry()
-    if isFile :
-        entry.id = fs.getdownloadurl(path,name)
+    if isFile:
+        entry.id = fs.getdownloadurl(path, name)
         #
     else:
         entry.id = utils.connect_path(utils.connect_path(Config.SITE_BOOK_LIST, path), name)
@@ -45,6 +44,7 @@ def create_entry(isFile, path, name):
     #TODO add Another Links
     entry.links = [Link(entry.id, Const.book_link_rel_subsection, name, _get_book_entry_type(name))]
     return entry
+
 
 def _get_book_entry_type(name):
     """
@@ -60,7 +60,7 @@ def _get_book_entry_type(name):
         return Const.book_type_mobi
     elif name.endswith(".txt"):
         return Const.book_type_text
-    elif name.find('.')!=-1:
+    elif name.find('.') != -1:
         return Const.book_type_content
     else:
         # No subifx
@@ -127,6 +127,7 @@ class FeedDoc:
         entry.appendChild(link)
         return link
 
+
 class Entry:
     def __init__(self, title=None, updated=None, id=None, content=None, links=[]):
         self.links = links
@@ -134,7 +135,6 @@ class Entry:
         self.id = id
         self.updated = updated
         self.title = title
-
 
 
 class Link:
@@ -164,7 +164,7 @@ class OpdsProtocol:
         """
         rslist = []
 
-            #not exist!
+        #not exist!
         if (not fs.exists(path)):
             print("dest Path [%s] is Not Exist." % path)
             return rslist
@@ -173,13 +173,13 @@ class OpdsProtocol:
             print("dest Path is a File Not Right." % path)
             return rslist
 
-        bookmap={}
+        bookmap = {}
         for name in fs.listdir(path):
             try:
                 name = name.decode("utf-8")
             except Exception:
                 try:
-                    name=name.decode("gbk")
+                    name = name.decode("gbk")
                 except Exception as e:
                     pass
 

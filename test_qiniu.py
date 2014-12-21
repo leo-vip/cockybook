@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # flake8: noqa
-import os  
+import os
 import string
 import random
 import tempfile
@@ -11,7 +11,8 @@ import pytest
 
 from qiniu import Auth, set_default, etag, PersistentFop, build_op, op_save
 from qiniu import put_data, put_file, put_stream
-from qiniu import BucketManager, build_batch_copy, build_batch_rename, build_batch_move, build_batch_stat, build_batch_delete
+from qiniu import BucketManager, build_batch_copy, build_batch_rename, build_batch_move, build_batch_stat, \
+    build_batch_delete
 from qiniu import urlsafe_base64_encode, urlsafe_base64_decode
 
 from qiniu.compat import is_py2, b
@@ -22,6 +23,7 @@ import qiniu.config
 
 if is_py2:
     import sys
+
     reload(sys)
     sys.setdefaultencoding('utf-8')
 
@@ -42,7 +44,7 @@ def rand_string(length):
 def create_temp_file(size):
     t = tempfile.mktemp()
     f = open(t, 'wb')
-    f.seek(size-1)
+    f.seek(size - 1)
     f.write(b('0'))
     f.close()
     return t
@@ -56,7 +58,6 @@ def remove_temp_file(file):
 
 
 class UtilsTest(unittest.TestCase):
-
     def test_urlsafe(self):
         a = '你好\x96'
         u = urlsafe_base64_encode(a)
@@ -64,7 +65,6 @@ class UtilsTest(unittest.TestCase):
 
 
 class AuthTestCase(unittest.TestCase):
-
     def test_token(self):
         token = dummy_auth.token('test')
         assert token == 'abcdefghklmnopq:mSNBTR7uS2crJsyFr2Amwv1LaYg='
@@ -120,7 +120,8 @@ class BucketTestCase(unittest.TestCase):
         assert ret == {}
 
     def test_fetch(self):
-        ret, info = self.bucket.fetch('http://developer.qiniu.com/docs/v6/sdk/python-sdk.html', bucket_name, 'fetch.html')
+        ret, info = self.bucket.fetch('http://developer.qiniu.com/docs/v6/sdk/python-sdk.html', bucket_name,
+                                      'fetch.html')
         print(info)
         assert ret == {}
 
@@ -136,7 +137,7 @@ class BucketTestCase(unittest.TestCase):
         assert info.status_code == 612
 
     def test_rename(self):
-        key = 'renameto'+rand_string(8)
+        key = 'renameto' + rand_string(8)
         self.bucket.copy(bucket_name, 'copyfrom', bucket_name, key)
         key2 = key + 'move'
         ret, info = self.bucket.rename(bucket_name, key, key2)
@@ -147,7 +148,7 @@ class BucketTestCase(unittest.TestCase):
         assert ret == {}
 
     def test_copy(self):
-        key = 'copyto'+rand_string(8)
+        key = 'copyto' + rand_string(8)
         ret, info = self.bucket.copy(bucket_name, 'copyfrom', bucket_name, key)
         print(info)
         assert ret == {}
@@ -161,7 +162,7 @@ class BucketTestCase(unittest.TestCase):
         assert ret == {}
 
     def test_batch_copy(self):
-        key = 'copyto'+rand_string(8)
+        key = 'copyto' + rand_string(8)
         ops = build_batch_copy(bucket_name, {'copyfrom': key}, bucket_name)
         ret, info = self.bucket.batch(ops)
         print(info)
@@ -172,7 +173,7 @@ class BucketTestCase(unittest.TestCase):
         assert ret[0]['code'] == 200
 
     def test_batch_move(self):
-        key = 'moveto'+rand_string(8)
+        key = 'moveto' + rand_string(8)
         self.bucket.copy(bucket_name, 'copyfrom', bucket_name, key)
         key2 = key + 'move'
         ops = build_batch_move(bucket_name, {key: key2}, bucket_name)
@@ -184,7 +185,7 @@ class BucketTestCase(unittest.TestCase):
         assert ret == {}
 
     def test_batch_rename(self):
-        key = 'rename'+rand_string(8)
+        key = 'rename' + rand_string(8)
         self.bucket.copy(bucket_name, 'copyfrom', bucket_name, key)
         key2 = key2 = key + 'rename'
         ops = build_batch_move(bucket_name, {key: key2}, bucket_name)
@@ -203,7 +204,6 @@ class BucketTestCase(unittest.TestCase):
 
 
 class UploaderTestCase(unittest.TestCase):
-
     mime_type = "text/plain"
     params = {'x:a': 'a'}
     q = Auth(access_key, secret_key)
@@ -270,7 +270,6 @@ class UploaderTestCase(unittest.TestCase):
 
 
 class ResumableUploaderTestCase(unittest.TestCase):
-
     mime_type = "text/plain"
     params = {'x:a': 'a'}
     q = Auth(access_key, secret_key)
@@ -307,16 +306,16 @@ class ResumableUploaderTestCase(unittest.TestCase):
         assert ret['key'] == key
         qiniu.set_default(default_up_host=qiniu.config.UPAUTO_HOST)
 
-class DownloadTestCase(unittest.TestCase):
 
+class DownloadTestCase(unittest.TestCase):
     q = Auth(access_key, secret_key)
 
     def test_private_url(self):
         private_bucket = 'private-res'
         private_key = 'gogopher.jpg'
-        base_url = 'http://%s/%s' % (private_bucket+'.qiniudn.com', private_key)
+        base_url = 'http://%s/%s' % (private_bucket + '.qiniudn.com', private_key)
         private_url = self.q.private_download_url(base_url, expires=3600)
-        print(private_url) 
+        print(private_url)
         r = requests.get(private_url)
         assert r.status_code == 200
 
@@ -331,6 +330,7 @@ class MediaTestCase(unittest.TestCase):
         ret, info = pfop.execute('sintel_trailer.mp4', ops, 1)
         print(info)
         assert ret['persistentId'] is not None
+
 
 if __name__ == '__main__':
     unittest.main()

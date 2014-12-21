@@ -37,7 +37,6 @@ _deprecated_policy_fields = set([
 
 
 class Auth(object):
-
     def __init__(self, access_key, secret_key):
         self.__checkKey(access_key, secret_key)
         self.__access_key, self.__secret_key = access_key, secret_key

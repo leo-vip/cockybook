@@ -6,7 +6,6 @@ from qiniu import http
 
 
 class BucketManager(object):
-
     def __init__(self, auth):
         self.auth = auth
 

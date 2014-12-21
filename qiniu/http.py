@@ -52,7 +52,7 @@ def _get(url, params, auth):
             url, params=params, auth=RequestsAuth(auth),
             timeout=config.get_default('connection_timeout'), headers=_headers)
     except Exception as e:
-        return None,  ResponseInfo(None, e)
+        return None, ResponseInfo(None, e)
     return __return_wrapper(r)
 
 

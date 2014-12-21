@@ -17,7 +17,8 @@ def put_data(
     return _form_put(up_token, key, data, params, mime_type, crc, False, progress_handler)
 
 
-def put_file(up_token, key, file_path, params=None, mime_type='application/octet-stream', check_crc=False, progress_handler=None):
+def put_file(up_token, key, file_path, params=None, mime_type='application/octet-stream', check_crc=False,
+             progress_handler=None):
     ret = {}
     size = os.stat(file_path).st_size
     with open(file_path, 'rb') as input_stream:
@@ -59,7 +60,6 @@ def put_stream(up_token, key, input_stream, data_size, params=None, mime_type=No
 
 
 class _Resume(object):
-
     def __init__(self, up_token, key, input_stream, data_size, params, mime_type, progress_handler):
         self.up_token = up_token
         self.key = key
@@ -86,8 +86,8 @@ class _Resume(object):
                     return ret, info
 
             self.blockStatus.append(ret)
-            if(callable(self.progress_handler)):
-                self.progress_handler(((len(self.blockStatus) - 1) * config._BLOCK_SIZE)+length, self.size)
+            if (callable(self.progress_handler)):
+                self.progress_handler(((len(self.blockStatus) - 1) * config._BLOCK_SIZE) + length, self.size)
         return self.make_file(host)
 
     def make_block(self, block, block_size, host):
