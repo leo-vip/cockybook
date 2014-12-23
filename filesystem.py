@@ -3,10 +3,9 @@
 
 import os
 import requests
-from w3lib import url
 import Config
 import json
-from qiniu import Auth, BucketManager
+
 from utils import connect_path, getFile
 
 __author__ = 'lei'
