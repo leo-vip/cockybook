@@ -1,7 +1,7 @@
 # coding: UTF-8
 
 from xml.dom.minidom import Document
-from flask import Flask, send_file
+from flask import Flask, send_file, make_response
 import Const
 from opdscore import FeedDoc, Link, OpdsProtocol, Entry
 
@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 
 @app.route("/")
-def helo():
+def root():
     f = FeedDoc(Document())
 
     entry = Entry()
@@ -28,20 +28,14 @@ def helo():
     # TODO add Another Links
     entry.links = [Link(entry.id, Const.book_link_rel_subsection, "Book List", Const.book_type_entry_catalog)]
     f.createEntry(entry)
-    return f.toString()
+    resp = make_response(f.toString())
+    resp.headers['Content-Type'] = 'application/xml; profile=opds-catalog; kind=navigation'
 
-    #f.createEntry("halo,OPds", "2014-12-11T07:10:23Z", "1234567890", "This is halo Opds Describe...",
-    #             {Link("http://www.baidu.com", "xxx", "aaa",
-    #                   "application/atom+xml;profile=opds-catalog;kind=acquisition"),
-    #              Link("http://163.com", "mm", "mm", "application/atom+xml;profile=opds-catalog;kind=acquisition")})
-
-    return f.toString() + "\n"
-
+    return resp
 
 @app.route('/list')
 def listbookroot():
     return listbooks('/')
-
 
 @app.route('/list/<path:path>')
 def listbooks(path):
@@ -52,20 +46,17 @@ def listbooks(path):
     for entry in l:
         feed.createEntry(entry)
 
-    #print(feed.toString().encode("utf-8"))
-    return feed.toString()
-
+    resp = make_response(feed.toString())
+    resp.headers['Content-Type'] = 'application/xml; profile=opds-catalog; kind=navigation'
+    return resp
 
 @app.route('/download/<path:path>')
 def download(path):
     """
     download book
-
     """
     filePath = getOpdsProtocol().dowloadBook(path)
-
     return send_file(filePath)
-
 
 @app.route('/show/<path:path>')
 def showhtml(path):

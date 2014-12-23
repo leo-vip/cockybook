@@ -24,7 +24,6 @@ def setfeedNS(feed):
     feed.setAttribute("xmlns:thr", "http://purl.org/syndication/thread/1.0")
     feed.setAttribute("xmlns:opensearch", "http://a9.com/-/spec/opensearch/1.1/")
 
-
 def getCreateDate(file_path):
     #return datetime.datetime.now(os.path.getctime(file_path)).strftime("%Y-%m-%dT%I:%M:%SZ")
     return datetime.datetime.now().strftime("%Y-%m-%dT%I:%M:%SZ")
@@ -32,19 +31,27 @@ def getCreateDate(file_path):
 
 def create_entry(isFile, path, name):
     entry = Entry()
-    if isFile:
-        entry.id = fs.getdownloadurl(path, name)
-        #
+    print(isFile)
+    print(name)
+    if not isFile:
+        entry.id = utils.connect_path(utils.connect_path(Config.SITE_BOOK_LIST,path),name)
+        entry.links=[]
+        entry.links.append(Link(entry.id, Const.book_link_rel_subsection, name, _get_book_entry_type(name)))
     else:
         entry.id = utils.connect_path(utils.connect_path(Config.SITE_BOOK_LIST, path), name)
+        #TODO add Another Links
+        links=fs.getdownloadurl(path, name)
+        entry.links=[]
+        if links !=None:
+            for link in links:
+                print(link)
+                entry.links.append(Link(link, Const.book_link_rel_subsection, name, _get_book_entry_type(link)))
     entry.content = name
     entry.title = name
 
     entry.updated = utils.getNow()
-    #TODO add Another Links
-    entry.links = [Link(entry.id, Const.book_link_rel_subsection, name, _get_book_entry_type(name))]
-    return entry
 
+    return entry
 
 def _get_book_entry_type(name):
     """
@@ -75,6 +82,7 @@ class FeedDoc:
         :return:
         """
         self.doc = doc
+
         self.feed = self.doc.createElement("feed")
         setfeedNS(self.feed)
         self.addNode(self.feed, Const.id, Config.SITE_URL)
@@ -105,7 +113,7 @@ class FeedDoc:
 
     def toString(self):
         # return self.doc.toxml("utf-8")
-        return self.doc.toprettyxml()
+        return self.doc.toprettyxml(encoding='utf-8')
 
     def createEntry(self, entry):
         entryNode = self.doc.createElement(Const.entry)
@@ -136,7 +144,6 @@ class Entry:
         self.updated = updated
         self.title = title
 
-
 class Link:
     """
     Link Entity
@@ -147,10 +154,6 @@ class Link:
         self.rel = rel
         self.title = title
         self.type = type
-
-
-#########################
-
 
 
 class OpdsProtocol:
@@ -174,22 +177,21 @@ class OpdsProtocol:
             return rslist
 
         bookmap = {}
+
         for name in fs.listdir(path):
             try:
                 name = name.decode("utf-8")
             except Exception:
                 try:
                     name = name.decode("gbk")
+
                 except Exception as e:
                     pass
 
             file_path = utils.connect_path(path, name)
-            if (fs.isfile(file_path)):
-                #print("file: " + file_path)
-                rslist.append(create_entry(True, path, name))
-            else:
-                #print("Dir: " + file_path)
-                rslist.append(create_entry(False, path, name))
+
+            rslist.append(create_entry(fs.isfile(file_path), path, name))
+
         return rslist
 
 
