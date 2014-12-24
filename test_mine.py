@@ -1,20 +1,16 @@
-from filesystem import QiniuFileSystem
+from filesystem import  LocalMetadataFileSystem
 import unittest
 
 __author__ = 'lei'
 
-fs = QiniuFileSystem()
+fs = LocalMetadataFileSystem()
 
 
 class MineTest(unittest.TestCase):
-    def test_list(self):
-        info = fs.listdir(u'Noval')
-        for inf in info:
-            print(inf)
 
-    def test_stat(self):
-        fs.exists(u'Noval')
+    def test_exists(self):
 
+        self.assertTrue(fs.exists(u'\u79d1\u6280'))
 
 if __name__ == "__main__":
     unittest.main()

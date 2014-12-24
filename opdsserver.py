@@ -9,6 +9,7 @@ import Config
 
 import utils
 
+import logging
 
 __author__ = 'lei'
 
@@ -33,11 +34,11 @@ def root():
 
     return resp
 
-@app.route('/list')
+@app.route('/list/')
 def listbookroot():
     return listbooks('/')
 
-@app.route('/list/<path:path>')
+@app.route('/list/<path:path>/')
 def listbooks(path):
     feed = FeedDoc(Document())
     # TODO add *** to feed.toString()
@@ -68,6 +69,10 @@ def getOpdsProtocol():
 
 
 if __name__ == "__main__":
+
+    logging.basicConfig(level=logging.DEBUG,
+                format='%(asctime)s %(filename)s[line:%(lineno)d] %(levelname)s %(message)s',
+                )
     app.debug = True
     app.run(host='0.0.0.0')
 

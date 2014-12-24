@@ -1,16 +1,16 @@
 # coding: UTF-8
-import os, json
+import os, json,sys
 
 def getTree(path):
     rs={}
     for filename in os.listdir(path):
-        print "filename :",filename
         
+        print "filename :",filename
         tmpname=os.path.join(path,filename)
         if os.path.isdir(tmpname):
             rs[filename] = getTree(tmpname)
         else:
-            justname=filename[:filename.find('.'):]
+            justname=filename[:filename.rfind('.'):]
             
             if rs.has_key(justname):
                 rs[justname].append(filename)
@@ -19,9 +19,9 @@ def getTree(path):
     return rs
             
 def writeMetadata(rsjson):
-    ff=open("metedata.xml", mode='w')
+    ff=open("metadata.json", mode='w')
     
-    ff.write(json.dumps(rsjson,indent=4,encoding='gbk'))    
+    ff.write(json.dumps(rsjson,indent=4,encoding='gbk').encode('utf8'))    
     ff.close()
 
 
@@ -31,8 +31,8 @@ def generateMetadataXml():
         
         rsjson.pop('generate')
     
-    if rsjson.has_key('metedata'):    
-        rsjson.pop('metedata')
+    if rsjson.has_key('metadata'):    
+        rsjson.pop('metadata')
     
     writeMetadata(rsjson)
 
@@ -51,11 +51,13 @@ def getFile(jjson,paths):
         return getFile(jjson[paths[0]], paths[1:])
     
 if __name__ == '__main__':
-    
-    #generateMetadataXml()
 
-    rsjson=json.load(open("F:/opds/metedata.xml"))
-    print json.dumps(rsjson,encoding='gbk')
-    print getFile(rsjson, u'/佛学'.split('/')[1:])
+
+    
+    generateMetadataXml()
+
+    #rsjson=getTree(".")
+    #print json.dumps(rsjson,encoding='gbk')
+    #print getFile(rsjson, '/佛学'.split('/')[1:])
 
     pass

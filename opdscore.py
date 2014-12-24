@@ -1,15 +1,18 @@
 # coding: UTF-8
+import logging
 from xml.dom.minidom import Document, Text, Element
 import datetime
 import Config
 import Const
-from filesystem import LocalFileSystem, QiniuFileSystem
+from filesystem import LocalFileSystem, QiniuFileSystem, LocalMetadataFileSystem
 import utils
 
 
 __author__ = 'lei'
 if Config.filesyste_type == 'LocalFileSystem':
     fs = LocalFileSystem()
+elif Config.filesyste_type =='LocalMetadataFileSystem':
+    fs = LocalMetadataFileSystem()
 else:
     fs = QiniuFileSystem()
 
@@ -30,13 +33,18 @@ def getCreateDate(file_path):
 
 
 def create_entry(isFile, path, name):
+    '''
+    create filesystem return object
+    :param isFile:
+    :param path:
+    :param name:
+    :return:
+    '''
     entry = Entry()
-    print(isFile)
-    print(name)
     if not isFile:
         entry.id = utils.connect_path(utils.connect_path(Config.SITE_BOOK_LIST,path),name)
         entry.links=[]
-        entry.links.append(Link(entry.id, Const.book_link_rel_subsection, name, _get_book_entry_type(name)))
+        entry.links.append(Link(entry.id, _get_book_entry_rel(name), name, _get_book_entry_type(name)))
     else:
         entry.id = utils.connect_path(utils.connect_path(Config.SITE_BOOK_LIST, path), name)
         #TODO add Another Links
@@ -44,8 +52,8 @@ def create_entry(isFile, path, name):
         entry.links=[]
         if links !=None:
             for link in links:
-                print(link)
-                entry.links.append(Link(link, Const.book_link_rel_subsection, name, _get_book_entry_type(link)))
+
+                entry.links.append(Link(link, _get_book_entry_rel(link), name, _get_book_entry_type(link)))
     entry.content = name
     entry.title = name
 
@@ -73,6 +81,25 @@ def _get_book_entry_type(name):
         # No subifx
         return Const.book_type_entry_catalog
 
+def _get_book_entry_rel(name):
+    """
+    get link type
+    """
+    if name.endswith(".pdf"):
+        return Const.book_link_rel__acquisition
+    elif name.endswith(".epub"):
+        return Const.book_link_rel__acquisition
+    elif name.endswith(".jpg"):
+        return Const.book_link_rel_image
+    elif name.endswith(".mobi"):
+        return Const.book_link_rel__acquisition
+    elif name.endswith(".txt"):
+        return Const.book_link_rel__acquisition
+    elif name.find('.') != -1:
+        return Const.book_link_rel_subsection
+    else:
+        # No subifx
+        return Const.book_link_rel_subsection
 
 class FeedDoc:
     def __init__(self, doc):
@@ -168,12 +195,15 @@ class OpdsProtocol:
         rslist = []
 
         #not exist!
+
         if (not fs.exists(path)):
-            print("dest Path [%s] is Not Exist." % path)
+            logging.info("dest Path [%s] is Not Exist." % path)
             return rslist
 
         if (fs.isfile(path)):
-            print("dest Path is a File Not Right." % path)
+            logging.info("dest Path [%s] is a File Not Right." % path)
+
+            rslist.append(create_entry(True, path, ''))
             return rslist
 
         bookmap = {}
