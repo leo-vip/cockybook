@@ -196,7 +196,7 @@ class OpdsProtocol:
 
         #not exist!
 
-        if (not fs.exists(path)):
+        if (path!='/' and  not fs.exists(path)):
             logging.info("dest Path [%s] is Not Exist." % path)
             return rslist
 

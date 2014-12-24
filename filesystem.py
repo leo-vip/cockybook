@@ -2,7 +2,7 @@
 import logging
 
 import os
-import requests
+import urllib2
 import Config
 import json
 
@@ -60,7 +60,7 @@ class LocalMetadataFileSystem(FileSystem):
 
     def exists(self, path):
         files=getFile(self.book_trees,self.getTruePaths(path))
-        return len(files)!=0
+        return files != None
 
     def isfile(self, path):
         if path.find('_-_') == -1:
@@ -97,9 +97,9 @@ class QiniuFileSystem(FileSystem):
 
     #bucket = BucketManager(q)
     def __init__(self):
-        ff=requests.get(connect_path(Config.SITE_BOOK_DONWLOAD,'metadata.json'))
-        if ff.status_code ==200:
-            self.book_trees = json.loads(ff.text)
+        resp=urllib2.urlopen(connect_path(Config.SITE_BOOK_DONWLOAD,'metadata.json'))
+        if resp.getcode() ==200:
+            self.book_trees = json.loads(resp.read())
 
     def outErr(self):
         logging.error("No Realyzed")

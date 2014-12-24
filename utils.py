@@ -37,11 +37,11 @@ def getFile(jjson,paths):
             else:
                 logging.warn( 'Jjson',json.dumps(jjson))
                 logging.warn( 'No this Key:', paths[0])
-                return []
+                return None
         elif len(paths)>1:
             return getFile(jjson[paths[0]], paths[1:])
     except AttributeError ,e:
         logging.error(e.message)
-        return []
+        return None
 
 
