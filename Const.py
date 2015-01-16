@@ -7,6 +7,7 @@ updated = "updated"
 icon = "icon"
 author = "author"
 link = "link"
+description = "description"
 
 #####################
 

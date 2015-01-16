@@ -1,7 +1,9 @@
 # coding: UTF-8
 import logging
+import os
 from xml.dom.minidom import Document, Text, Element
 import datetime
+from flask import g
 import Config
 import Const
 from filesystem import LocalFileSystem, QiniuFileSystem, LocalMetadataFileSystem
@@ -22,7 +24,7 @@ def setfeedNS(feed):
     feed.setAttribute("xmlns:opds", "http://opds-spec.org/2010/catalog")
     feed.setAttribute("xmlns:opds", Config.SITE_URL)
     feed.setAttribute("xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance")
-    feed.setAttribute("xmlns", "http://www.w3.org/2005/Atom")
+    #feed.setAttribute("xmlns", "http://www.w3.org/2005/Atom")
     feed.setAttribute("xmlns:dcterms", "http://purl.org/dc/terms/")
     feed.setAttribute("xmlns:thr", "http://purl.org/syndication/thread/1.0")
     feed.setAttribute("xmlns:opensearch", "http://a9.com/-/spec/opensearch/1.1/")
@@ -49,16 +51,40 @@ def create_entry(isFile, path, name):
         entry.id = utils.connect_path(utils.connect_path(Config.SITE_BOOK_LIST, path), name)
         #TODO add Another Links
         links=fs.getdownloadurl(path, name)
+        #name=os.path.basename(path)
         entry.links=[]
         if links !=None:
             for link in links:
-
                 entry.links.append(Link(link, _get_book_entry_rel(link), name, _get_book_entry_type(link)))
     entry.content = name
     entry.title = name
-
     entry.updated = utils.getNow()
+    return entry
 
+def create__single_entry(isFile, path, name):
+    '''
+    create filesystem return object for file request
+    :param isFile:
+    :param path:
+    :param name:
+    :return:
+    '''
+    entry = Entry()
+    if not isFile:
+        entry.id = utils.connect_path(utils.connect_path(Config.SITE_BOOK_LIST,path),name)
+        entry.links=[]
+        entry.links.append(Link(entry.id, _get_book_entry_rel(name), name, _get_book_entry_type(name)))
+    else:
+        entry.id = utils.connect_path(utils.connect_path(Config.SITE_BOOK_LIST, path), name)
+        #TODO add Another Links
+        links=fs.getdownloadurl(os.path.dirname(path), name)
+        entry.links=[]
+        if links !=None:
+            for link in links:
+                entry.links.append(Link(link, _get_book_entry_rel(link), name, _get_book_entry_type(link)))
+    entry.content = name
+    entry.title = name
+    entry.updated = utils.getNow()
     return entry
 
 def _get_book_entry_type(name):
@@ -102,25 +128,33 @@ def _get_book_entry_rel(name):
         return Const.book_link_rel_subsection
 
 class FeedDoc:
-    def __init__(self, doc):
+    def __init__(self, doc , path=None):
         """
         Root Element
         :param doc:  Document()
         :return:
         """
         self.doc = doc
-
+        # xml-stylesheet
+        if fs.isfile(path):
+            self.doc.appendChild(self.doc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\"%s/static/bookdetail.xsl\""%Config.SITE_URL))
+        else:
+            self.doc.appendChild(self.doc.createProcessingInstruction("xml-stylesheet","type=\"text/xsl\" href=\"%s/static/booklist.xsl\""%Config.SITE_URL))
+        # feed
         self.feed = self.doc.createElement("feed")
         setfeedNS(self.feed)
         self.addNode(self.feed, Const.id, Config.SITE_URL)
         self.addNode(self.feed, Const.author, Config.SITE_EMAIL)
         self.addNode(self.feed, Const.title, Config.SITE_TITLE)
         self.addNode(self.feed, Const.updated, utils.getNow())
+        self.addNode(self.feed, Const.description, Config.description)
         self.createLink(self.feed, Config.SITE_URL, "Home", "Home",
                         "application/atom+xml; profile=opds-catalog; kind=navigation")
 
         self.doc.appendChild(self.feed)
         pass
+
+
 
     def addNode(self, element, key, value, link=None):
         """
@@ -159,9 +193,10 @@ class FeedDoc:
         link.setAttribute("rel", rel)
         link.setAttribute("title", title)
         link.setAttribute("type", type)
+        text = self.doc.createTextNode(href)
+        link.appendChild(text)
         entry.appendChild(link)
         return link
-
 
 class Entry:
     def __init__(self, title=None, updated=None, id=None, content=None, links=[]):
@@ -202,8 +237,8 @@ class OpdsProtocol:
 
         if (fs.isfile(path)):
             logging.info("dest Path [%s] is a File Not Right." % path)
-
-            rslist.append(create_entry(True, path, ''))
+            g.book_process = "detail"
+            rslist.append(create__single_entry(True, path, os.path.basename(path)))
             return rslist
 
         bookmap = {}

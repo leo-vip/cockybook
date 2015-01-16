@@ -1,7 +1,7 @@
 # coding: UTF-8
 
 from xml.dom.minidom import Document
-from flask import Flask, send_file, make_response
+from flask import Flask, send_file, make_response, g
 import Const
 from opdscore import FeedDoc, Link, OpdsProtocol, Entry
 
@@ -15,11 +15,14 @@ __author__ = 'lei'
 
 app = Flask(__name__)
 
+@app.route("/static/<path:stcpath>")
+def css(stcpath):
+    return app.send_static_file(stcpath)
 
 @app.route("/")
 def root():
-    f = FeedDoc(Document())
-
+    d=Document()
+    f = FeedDoc(d)
     entry = Entry()
     entry.id = Config.SITE_BOOK_LIST
     entry.content = "all Books List By Type"
@@ -35,12 +38,10 @@ def root():
     return resp
 
 @app.route('/list/')
-def listbookroot():
-    return listbooks('/')
-
 @app.route('/list/<path:path>/')
-def listbooks(path):
-    feed = FeedDoc(Document())
+def listbooks(path="/"):
+    feed = FeedDoc(Document(), path)
+
     # TODO add *** to feed.toString()
     l = getOpdsProtocol().listBooks(path)
 
@@ -48,7 +49,7 @@ def listbooks(path):
         feed.createEntry(entry)
 
     resp = make_response(feed.toString())
-    resp.headers['Content-Type'] = 'application/xml; profile=opds-catalog; kind=navigation'
+    resp.headers['Content-Type'] = 'text/xml; profile=opds-catalog; kind=navigation'
     return resp
 
 @app.route('/download/<path:path>')

@@ -88,7 +88,7 @@ class LocalMetadataFileSystem(FileSystem):
     def getdownloadurl(self, path, name):
         tmp = connect_path(path,name)
 
-        files=getFile(self.book_trees,self.getTruePaths(tmp))
+        files=getFile(self.book_trees, self.getTruePaths(tmp))
 
         return [connect_path(Config.SITE_BOOK_DONWLOAD,connect_path(path, ee)) for ee in files]
 

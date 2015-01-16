@@ -1,9 +1,11 @@
+# coding: UTF-8
+
 __author__ = 'lei'
 
 
 # #############################
 #root for opds server website
-#SITE_URL = "http://192.168.1.104:5000"
+#SITE_URL = "http://10.10.113.237:5000"
 SITE_URL = "http://opds.cockybook.com"
 SITE_TITLE = "Opds CockyBook"
 SITE_EMAIL = "yinlei212@gmail.com"
@@ -19,3 +21,7 @@ base = "f:\\opds"
 #filesyste_type='LocalFileSystem'
 #filesyste_type = 'QiniuFileSystem'
 filesyste_type = 'LocalMetadataFileSystem'
+
+description=u"""
+OPDS 标准核心功能是支持 EPUB 标准和基于 Atom XML 的目录格式。
+"""
