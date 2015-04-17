@@ -61,12 +61,10 @@
                             </h1>
                         </div>
                     </div>
-                    <div class="description">
-                        <p >
+                    <div class="description row">
+                        <p class="span8">
                             <xsl:value-of select="/feed/description"/>
-                            <xsl:text>opds html viewer</xsl:text>
                         </p>
-
 
                     </div>
                     <div class="container header">

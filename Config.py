@@ -23,5 +23,7 @@ base = "f:\\opds"
 filesyste_type = 'LocalMetadataFileSystem'
 
 description=u"""
-OPDS 标准核心功能是支持 EPUB 标准和基于 Atom XML 的目录格式。
+     OPDS 标准核心功能是支持 EPUB 标准和基于 Atom XML 的目录格式.
+可以使用阅读器进行在线书库添加，比如FBReader、静读天下（Moon+ Reader）、Aldiko、Stanza等等.
+添加地址为:   http://opds.cockybook.com
 """

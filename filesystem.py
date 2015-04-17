@@ -63,6 +63,8 @@ class LocalMetadataFileSystem(FileSystem):
         return files != None
 
     def isfile(self, path):
+        if path is None:
+            return False
         if path.find('_-_') == -1:
             return False
         else:
